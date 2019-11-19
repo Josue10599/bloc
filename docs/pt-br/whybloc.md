@@ -1,4 +1,4 @@
-# Why Bloc?
+# Por quê Bloc?
 
 > Bloc torna fácil separar _apresentação_ da _lógica de negócio_, deixando o seu código _rápido_, _fácil de testar_ e _reutilizável_.
 
