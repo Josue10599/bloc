@@ -1,3 +1,33 @@
+# 3.1.0
+
+- Add `verify` to `blocTest` ([#781](https://github.com/felangel/bloc/issues/781))
+
+# 3.0.1
+
+- Enable `blocTest` to add more than one asynchronous event at a time ([#724](https://github.com/felangel/bloc/issues/724))
+
+# 3.0.0
+
+- Update to `bloc: ^3.0.0`
+- `emitsExactly` supports optional `duration` for async operators like `debounceTime` ([#726](https://github.com/felangel/bloc/issues/726))
+- `blocTest` supports optional `wait` for async operators like `debounceTime` ([#726](https://github.com/felangel/bloc/issues/726))
+
+# 3.0.0-dev.1
+
+- Update to `bloc: ^3.0.0-dev.1`
+
+# 2.2.2
+
+- Minor internal improvements (fixed analysis warning in `emitsExactly`)
+
+# 2.2.1
+
+- Minor documentation improvements (syntax highlighting in README)
+
+# 2.2.0
+
+- `emitsExactly` and `blocTest` support `Iterable<Matcher` ([#695](https://github.com/felangel/bloc/issues/695))
+
 # 2.1.0
 
 - Add `MockBloc` to `bloc_test` in order to simplify bloc mocks (addresses [#636](https://github.com/felangel/bloc/issues/636))

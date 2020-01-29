@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+
+import 'repository_provider.dart';
 
 /// {@template multirepositoryprovider}
 /// Merges multiple [RepositoryProvider] widgets into one widget tree.
@@ -12,11 +13,11 @@ import 'package:provider/provider.dart';
 ///
 /// ```dart
 /// RepositoryProvider<RepositoryA>(
-///   builder: (context) => RepositoryA(),
+///   create: (context) => RepositoryA(),
 ///   child: RepositoryProvider<RepositoryB>(
-///     builder: (context) => RepositoryB(),
+///     create: (context) => RepositoryB(),
 ///     child: RepositoryProvider<RepositoryC>(
-///       builder: (context) => RepositoryC(),
+///       create: (context) => RepositoryC(),
 ///       child: ChildA(),
 ///     )
 ///   )
@@ -28,28 +29,31 @@ import 'package:provider/provider.dart';
 /// ```dart
 /// MultiRepositoryProvider(
 ///   providers: [
-///     RepositoryProvider<RepositoryA>(builder: (context) => RepositoryA()),
-///     RepositoryProvider<RepositoryB>(builder: (context) => RepositoryB()),
-///     RepositoryProvider<RepositoryC>(builder: (context) => RepositoryC()),
+///     RepositoryProvider<RepositoryA>(create: (context) => RepositoryA()),
+///     RepositoryProvider<RepositoryB>(create: (context) => RepositoryB()),
+///     RepositoryProvider<RepositoryC>(create: (context) => RepositoryC()),
 ///   ],
 ///   child: ChildA(),
 /// )
 /// ```
 ///
-/// [MultiRepositoryProvider] converts the [RepositoryProvider] list
-/// into a tree of nested [RepositoryProvider] widgets.
-/// As a result, the only advantage of using [MultiRepositoryProvider] is improved
-/// readability due to the reduction in nesting and boilerplate.
+/// [MultiRepositoryProvider] converts the [RepositoryProvider] list into a tree
+/// of nested [RepositoryProvider] widgets.
+/// As a result, the only advantage of using [MultiRepositoryProvider] is
+/// improved readability due to the reduction in nesting and boilerplate.
 /// {@endtemplate}
 class MultiRepositoryProvider extends StatelessWidget {
-  /// The [RepositoryProvider] list which is converted into a tree of [RepositoryProvider] widgets.
-  /// The tree of [RepositoryProvider] widgets is created in order meaning the first [RepositoryProvider]
-  /// will be the top-most [RepositoryProvider] and the last [RepositoryProvider] will be a direct ancestor
-  /// of [child].
-  final List<RepositoryProvider> providers;
+  /// The [RepositoryProvider] list which is converted into a tree of
+  /// [RepositoryProvider] widgets.
+  /// The tree of [RepositoryProvider] widgets is created in order meaning
+  /// the first [RepositoryProvider] will be the top-most [RepositoryProvider]
+  /// and the last [RepositoryProvider] will be a direct ancestor of [child].
+  final List<RepositoryProviderSingleChildWidget> providers;
 
-  /// The widget and its descendants which will have access to every value provided by [providers].
-  /// [child] will be a direct descendent of the last [RepositoryProvider] in [providers].
+  /// The widget and its descendants which will have access to every value
+  /// provided by [providers].
+  /// [child] will be a direct descendent of the last [RepositoryProvider] in
+  /// [providers].
   final Widget child;
 
   /// {@macro multirepositoryprovider}

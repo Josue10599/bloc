@@ -9,7 +9,7 @@ export function analyzeDependencies() {
   const dependenciesToAnalyze = [
     {
       name: "equatable",
-      version: "^0.6.1",
+      version: "^1.0.0",
       actions: [
         {
           name: "Open Migration Guide",
@@ -23,10 +23,12 @@ export function analyzeDependencies() {
         }
       ]
     },
-    { name: "bloc", version: "^2.0.0", actions: [] },
-    { name: "bloc_test", version: "^2.0.0", actions: [] },
-    { name: "flutter_bloc", version: "^2.0.0", actions: [] },
-    { name: "angular_bloc", version: "^2.0.0", actions: [] }
+    { name: "bloc", version: "^3.0.0", actions: [] },
+    { name: "bloc_test", version: "^3.0.0", actions: [] },
+    { name: "flutter_bloc", version: "^3.1.0", actions: [] },
+    { name: "angular_bloc", version: "^3.0.0", actions: [] },
+    { name: "hydrated_bloc", version: "^3.0.0", actions: [] },
+    { name: "sealed_flutter_bloc", version: "^3.0.0", actions: [] }
   ];
 
   const dependencies = _.get(getPubspec(), "dependencies", {});
@@ -36,6 +38,7 @@ export function analyzeDependencies() {
     if (_.has(dependencies, dependency.name)) {
       const dependencyVersion = _.get(dependencies, dependency.name, "latest");
       if (dependencyVersion === "latest") continue;
+      if (dependencyVersion === "any") continue;
       if (dependencyVersion == null) continue;
       if (typeof dependencyVersion !== "string") continue;
       const minVersion = _.get(

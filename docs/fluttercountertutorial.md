@@ -27,7 +27,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   meta: ^1.1.6
 
 dev_dependencies:
@@ -92,7 +92,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       home: BlocProvider<CounterBloc>(
-        builder: (context) => CounterBloc(),
+        create: (context) => CounterBloc(),
         child: CounterPage(),
       ),
     );

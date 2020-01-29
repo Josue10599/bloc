@@ -22,14 +22,14 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.0.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   meta: ^1.1.6
-  equatable: ^0.6.0
+  equatable: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -481,7 +481,7 @@ class LoginPage extends StatelessWidget {
         title: Text('Login'),
       ),
       body: BlocProvider(
-        builder: (context) {
+        create: (context) {
           return LoginBloc(
             authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
             userRepository: userRepository,
@@ -633,7 +633,7 @@ void main() {
   final userRepository = UserRepository();
   runApp(
     BlocProvider<AuthenticationBloc>(
-      builder: (context) {
+      create: (context) {
         return AuthenticationBloc(userRepository: userRepository)
           ..add(AppStarted());
       },

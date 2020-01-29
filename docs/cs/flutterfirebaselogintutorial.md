@@ -33,7 +33,7 @@ dependencies:
   cloud_firestore: ^0.9.7
   firebase_auth: ^0.8.1+4
   google_sign_in: ^4.0.1+1
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   equatable: ^0.6.0
   meta: ^1.1.6
   font_awesome_flutter: ^8.4.0
@@ -462,7 +462,7 @@ void main() {
   final UserRepository userRepository = UserRepository();
   runApp(
     BlocProvider(
-      builder: (context) => AuthenticationBloc(userRepository: userRepository)
+      create: (context) => AuthenticationBloc(userRepository: userRepository)
         ..add(AppStarted()),
       child: App(userRepository: userRepository),
     ),
@@ -492,7 +492,7 @@ void main() {
   final UserRepository userRepository = UserRepository();
   runApp(
     BlocProvider(
-      builder: (context) => AuthenticationBloc(userRepository: userRepository)
+      create: (context) => AuthenticationBloc(userRepository: userRepository)
         ..add(AppStarted()),
       child: App(userRepository: userRepository),
     ),
@@ -565,7 +565,7 @@ void main() {
   final UserRepository userRepository = UserRepository();
   runApp(
     BlocProvider(
-      builder: (context) => AuthenticationBloc(userRepository: userRepository)
+      create: (context) => AuthenticationBloc(userRepository: userRepository)
         ..add(AppStarted()),
       child: App(userRepository: userRepository),
     ),
@@ -611,7 +611,7 @@ void main() {
   final UserRepository userRepository = UserRepository();
   runApp(
     BlocProvider(
-      builder: (context) => AuthenticationBloc(userRepository: userRepository)
+      create: (context) => AuthenticationBloc(userRepository: userRepository)
         ..add(AppStarted()),
       child: App(userRepository: userRepository),
     ),
@@ -707,7 +707,7 @@ void main() {
   final UserRepository userRepository = UserRepository();
   runApp(
     BlocProvider(
-      builder: (context) => AuthenticationBloc(userRepository: userRepository)
+      create: (context) => AuthenticationBloc(userRepository: userRepository)
         ..add(AppStarted()),
       child: App(userRepository: userRepository),
     ),
@@ -1121,7 +1121,7 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: BlocProvider<LoginBloc>(
-        builder: (context) => LoginBloc(userRepository: _userRepository),
+        create: (context) => LoginBloc(userRepository: _userRepository),
         child: LoginForm(userRepository: _userRepository),
       ),
     );
@@ -1232,6 +1232,7 @@ class _LoginFormState extends State<LoginForm> {
                       icon: Icon(Icons.email),
                       labelText: 'Email',
                     ),
+                    keyboardType: TextInputType.emailAddress,
                     autovalidate: true,
                     autocorrect: false,
                     validator: (_) {
@@ -1728,7 +1729,7 @@ class RegisterScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Register')),
       body: Center(
         child: BlocProvider<RegisterBloc>(
-          builder: (context) => RegisterBloc(userRepository: _userRepository),
+          create: (context) => RegisterBloc(userRepository: _userRepository),
           child: RegisterForm(),
         ),
       ),
@@ -1828,6 +1829,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       icon: Icon(Icons.email),
                       labelText: 'Email',
                     ),
+                    keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
                     autovalidate: true,
                     validator: (_) {
@@ -1945,7 +1947,7 @@ void main() {
   final UserRepository userRepository = UserRepository();
   runApp(
     BlocProvider(
-      builder: (context) => AuthenticationBloc(userRepository: userRepository)
+      create: (context) => AuthenticationBloc(userRepository: userRepository)
         ..add(AppStarted()),
       child: App(userRepository: userRepository),
     ),

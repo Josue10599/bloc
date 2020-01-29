@@ -21,12 +21,12 @@ name: flutter_todos
 description: A new Flutter project.
 
 environment:
-  sdk: ">=2.0.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
-  meta: ">=1.1.0 <2.0.0"
-  equatable: ^0.6.0
-  flutter_bloc: ^2.0.0
+  meta: ^1.1.6
+  equatable: ^1.0.0
+  flutter_bloc: ^3.1.0
   flutter:
     sdk: flutter
 
@@ -35,17 +35,18 @@ dependency_overrides:
     git:
       url: https://github.com/felangel/flutter_architecture_samples
       path: todos_app_core
-      ref: expose-repositories
+      ref: rxdart/0.23.0
   todos_repository_core:
     git:
       url: https://github.com/felangel/flutter_architecture_samples
       path: todos_repository_core
-      ref: expose-repositories
+      ref: rxdart/0.23.0
   todos_repository_simple:
     git:
       url: https://github.com/felangel/flutter_architecture_samples
       path: todos_repository_simple
-      ref: expose-repositories
+      ref: rxdart/0.23.0
+
 flutter:
   uses-material-design: true
 ```
@@ -1754,7 +1755,7 @@ void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(
     BlocProvider(
-      builder: (context) {
+      create: (context) {
         return TodosBloc(
           todosRepository: const TodosRepositoryFlutter(
             fileStorage: const FileStorage(
@@ -1792,15 +1793,15 @@ class TodosApp extends StatelessWidget {
           return MultiBlocProvider(
             providers: [
               BlocProvider<TabBloc>(
-                builder: (context) => TabBloc(),
+                create: (context) => TabBloc(),
               ),
               BlocProvider<FilteredTodosBloc>(
-                builder: (context) => FilteredTodosBloc(
+                create: (context) => FilteredTodosBloc(
                   todosBloc: BlocProvider.of<TodosBloc>(context),
                 ),
               ),
               BlocProvider<StatsBloc>(
-                builder: (context) => StatsBloc(
+                create: (context) => StatsBloc(
                   todosBloc: BlocProvider.of<TodosBloc>(context),
                 ),
               ),
@@ -1838,13 +1839,13 @@ The `TodosApp` also makes the `TabBloc`, `FilteredTodosBloc`, and `StatsBloc` av
 MultiBlocProvider(
   providers: [
     BlocProvider<TabBloc>(
-      builder: (context) => TabBloc(),
+      create: (context) => TabBloc(),
     ),
     BlocProvider<FilteredTodosBloc>(
-      builder: (context) => FilteredTodosBloc(todosBloc: todosBloc),
+      create: (context) => FilteredTodosBloc(todosBloc: todosBloc),
     ),
     BlocProvider<StatsBloc>(
-      builder: (context) => StatsBloc(todosBloc: todosBloc),
+      create: (context) => StatsBloc(todosBloc: todosBloc),
     ),
   ],
   child: HomeScreen(),
@@ -1855,11 +1856,11 @@ is equivalent to writing
 
 ```dart
 BlocProvider<TabBloc>(
-  builder: (context) => TabBloc(),
+  create: (context) => TabBloc(),
   child: BlocProvider<FilteredTodosBloc>(
-    builder: (context) => FilteredTodosBloc(todosBloc: todosBloc),
+    create: (context) => FilteredTodosBloc(todosBloc: todosBloc),
     child: BlocProvider<StatsBloc>(
-      builder: (context) => StatsBloc(todosBloc: todosBloc),
+      create: (context) => StatsBloc(todosBloc: todosBloc),
       child: Scaffold(...),
     ),
   ),
@@ -1889,7 +1890,7 @@ void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(
     BlocProvider(
-      builder: (context) {
+      create: (context) {
         return TodosBloc(
           todosRepository: const TodosRepositoryFlutter(
             fileStorage: const FileStorage(
@@ -1919,15 +1920,15 @@ class TodosApp extends StatelessWidget {
           return MultiBlocProvider(
             providers: [
               BlocProvider<TabBloc>(
-                builder: (context) => TabBloc(),
+                create: (context) => TabBloc(),
               ),
               BlocProvider<FilteredTodosBloc>(
-                builder: (context) => FilteredTodosBloc(
+                create: (context) => FilteredTodosBloc(
                   todosBloc: BlocProvider.of<TodosBloc>(context),
                 ),
               ),
               BlocProvider<StatsBloc>(
-                builder: (context) => StatsBloc(
+                create: (context) => StatsBloc(
                   todosBloc: BlocProvider.of<TodosBloc>(context),
                 ),
               ),

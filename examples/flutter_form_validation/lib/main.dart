@@ -15,7 +15,7 @@ class App extends StatelessWidget {
         body: Padding(
           padding: EdgeInsets.all(20.0),
           child: BlocProvider(
-            builder: (context) => MyFormBloc(),
+            create: (context) => MyFormBloc(),
             child: MyForm(),
           ),
         ),
@@ -61,6 +61,7 @@ class _MyFormState extends State<MyForm> {
                   icon: Icon(Icons.email),
                   labelText: 'Email',
                 ),
+                keyboardType: TextInputType.emailAddress,
                 autovalidate: true,
                 validator: (_) {
                   return state.isEmailValid ? null : 'Invalid Email';

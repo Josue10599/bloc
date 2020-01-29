@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   http: ^0.12.0
   equatable: ^0.6.0
 
@@ -431,7 +431,7 @@ class App extends StatelessWidget {
           title: Text('Posts'),
         ),
         body: BlocProvider(
-          builder: (context) =>
+          create: (context) =>
               PostBloc(httpClient: http.Client())..add(Fetch()),
           child: HomePage(),
         ),

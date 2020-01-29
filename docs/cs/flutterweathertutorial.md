@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   http: ^0.12.0
   equatable: ^0.6.0
 
@@ -531,7 +531,7 @@ class WeatherRepository {
 
   Future<Weather> getWeather(String city) async {
     final int locationId = await weatherApiClient.getLocationId(city);
-    return await weatherApiClient.fetchWeather(locationId);
+    return weatherApiClient.fetchWeather(locationId);
   }
 }
 ```
@@ -747,7 +747,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Weather',
       home: BlocProvider(
-        builder: (context) =>
+        create: (context) =>
             WeatherBloc(weatherRepository: weatherRepository),
         child: Weather(),
       ),
@@ -1404,7 +1404,7 @@ void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(
     BlocProvider<ThemeBloc>(
-      builder: (context) => ThemeBloc(),
+      create: (context) => ThemeBloc(),
       child: App(weatherRepository: weatherRepository),
     ),
   );
@@ -1429,7 +1429,7 @@ class App extends StatelessWidget {
           title: 'Flutter Weather',
           theme: themeState.theme,
           home: BlocProvider(
-            builder: (context) =>
+            create: (context) =>
                 WeatherBloc(weatherRepository: weatherRepository),
             child: Weather(),
           ),
@@ -1686,10 +1686,10 @@ void main() {
     MultiBlocProvider(
       providers: [
         BlocProvider<ThemeBloc>(
-          builder: (context) => ThemeBloc(),
+          create: (context) => ThemeBloc(),
         ),
         BlocProvider<SettingsBloc>(
-          builder: (context) => SettingsBloc(),
+          create: (context) => SettingsBloc(),
         ),
       ],
       child: App(weatherRepository: weatherRepository),

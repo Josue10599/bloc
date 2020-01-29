@@ -1,48 +1,67 @@
 import 'package:flutter/widgets.dart';
+
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:bloc/bloc.dart';
 
+/// Mixin which allows `MultiBlocProvider` to infer the types
+/// of multiple [BlocProvider]s.
+mixin BlocProviderSingleChildWidget on SingleChildWidget {}
+
 /// {@template blocprovider}
-/// Takes a [ValueBuilder] that is responsible for
-/// building the [bloc] and a [child] which will have access to the [bloc] via `BlocProvider.of(context)`.
-/// It is used as a dependency injection (DI) widget so that a single instance of a [bloc] can be provided
-/// to multiple widgets within a subtree.
+/// Takes a [ValueBuilder] that is responsible for creating the [bloc] and
+/// a [child] which will have access to the [bloc] via
+/// `BlocProvider.of(context)`.
+/// It is used as a dependency injection (DI) widget so that a single instance
+/// of a [bloc] can be provided to multiple widgets within a subtree.
 ///
-/// Automatically handles closing the [bloc] when used with a [builder].
+/// Automatically handles closing the [bloc] when used with [create] and lazily
+/// creates the provided [bloc] unless [lazy] is set to `false`.
 ///
 /// ```dart
 /// BlocProvider(
-///   builder: (BuildContext context) => BlocA(),
+///   create: (BuildContext context) => BlocA(),
 ///   child: ChildA(),
 /// );
 /// ```
 /// {@endtemplate}
 class BlocProvider<T extends Bloc<dynamic, dynamic>>
-    extends ValueDelegateWidget<T> implements SingleChildCloneableWidget {
+    extends SingleChildStatelessWidget with BlocProviderSingleChildWidget {
   /// [child] and its descendants which will have access to the [bloc].
   final Widget child;
+
+  /// Whether or not the [bloc] being provided should be lazily created.
+  /// Defaults to `true`.
+  final bool lazy;
+
+  final Dispose<T> _dispose;
+
+  final Create<T> _create;
 
   /// {@macro blocprovider}
   BlocProvider({
     Key key,
-    ValueBuilder<T> builder,
+    @required Create<T> create,
     Widget child,
+    bool lazy,
   }) : this._(
           key: key,
-          delegate: BuilderStateDelegate<T>(
-            builder,
-            dispose: (_, bloc) => bloc?.close(),
-          ),
+          create: create,
+          dispose: (_, bloc) => bloc?.close(),
           child: child,
+          lazy: lazy,
         );
 
-  /// Takes a [bloc] and a [child] which will have access to the [bloc] via `BlocProvider.of(context)`.
-  /// When `BlocProvider.value` is used, the [bloc] will not be automatically closed.
-  /// As a result, `BlocProvider.value` should mainly be used for providing existing [bloc]s
-  /// to new routes.
+  /// Takes a [bloc] and a [child] which will have access to the [bloc] via
+  /// `BlocProvider.of(context)`.
+  /// When `BlocProvider.value` is used, the [bloc] will not be automatically
+  /// closed.
+  /// As a result, `BlocProvider.value` should mainly be used for providing
+  /// existing [bloc]s to new routes.
   ///
   /// A new [bloc] should not be created in `BlocProvider.value`.
-  /// [bloc]s should always be created using the default constructor within the [builder].
+  /// [bloc]s should always be created using the default constructor within
+  /// [create].
   ///
   /// ```dart
   /// BlocProvider.value(
@@ -55,7 +74,7 @@ class BlocProvider<T extends Bloc<dynamic, dynamic>>
     Widget child,
   }) : this._(
           key: key,
-          delegate: SingleValueDelegate<T>(value),
+          create: (_) => value,
           child: child,
         );
 
@@ -63,15 +82,19 @@ class BlocProvider<T extends Bloc<dynamic, dynamic>>
   /// Used by the [BlocProvider] default and value constructors.
   BlocProvider._({
     Key key,
-    @required ValueStateDelegate<T> delegate,
+    @required Create<T> create,
+    Dispose<T> dispose,
     this.child,
-  }) : super(key: key, delegate: delegate);
+    this.lazy,
+  })  : _create = create,
+        _dispose = dispose,
+        super(key: key, child: child);
 
-  /// Method that allows widgets to access a [bloc] instance as long as their `BuildContext`
-  /// contains a [BlocProvider] instance.
+  /// Method that allows widgets to access a [bloc] instance as long as their
+  /// `BuildContext` contains a [BlocProvider] instance.
   ///
-  /// If we want to access an instance of `BlocA` which was provided higher up in the widget tree
-  /// we can do so via:
+  /// If we want to access an instance of `BlocA` which was provided higher up
+  /// in the widget tree we can do so via:
   ///
   /// ```dart
   /// BlocProvider.of<BlocA>(context)
@@ -79,18 +102,13 @@ class BlocProvider<T extends Bloc<dynamic, dynamic>>
   static T of<T extends Bloc<dynamic, dynamic>>(BuildContext context) {
     try {
       return Provider.of<T>(context, listen: false);
-    } on Object catch (_) {
+    } on dynamic catch (_) {
       throw FlutterError(
         """
         BlocProvider.of() called with a context that does not contain a Bloc of type $T.
         No ancestor could be found starting from the context that was passed to BlocProvider.of<$T>().
 
-        This can happen if:
-        1. The context you used comes from a widget above the BlocProvider.
-        2. You used MultiBlocProvider and didn\'t explicity provide the BlocProvider types.
-
-        Good: BlocProvider<$T>(builder: (context) => $T())
-        Bad: BlocProvider(builder: (context) => $T()).
+        This can happen if the context you used comes from a widget above the BlocProvider.
 
         The context used was: $context
         """,
@@ -99,19 +117,12 @@ class BlocProvider<T extends Bloc<dynamic, dynamic>>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWithChild(BuildContext context, Widget child) {
     return InheritedProvider<T>(
-      value: delegate.value,
+      create: _create,
+      dispose: _dispose,
       child: child,
-    );
-  }
-
-  @override
-  BlocProvider<T> cloneWithChild(Widget child) {
-    return BlocProvider<T>._(
-      key: key,
-      delegate: delegate,
-      child: child,
+      lazy: lazy,
     );
   }
 }

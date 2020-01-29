@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SimpleBlocDelegate extends BlocDelegate {
@@ -34,13 +33,13 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ThemeBloc>(
-      builder: (context) => ThemeBloc(),
+      create: (context) => ThemeBloc(),
       child: BlocBuilder<ThemeBloc, ThemeData>(
         builder: (context, theme) {
           return MaterialApp(
             title: 'Flutter Demo',
             home: BlocProvider(
-              builder: (context) => CounterBloc(),
+              create: (context) => CounterBloc(),
               child: CounterPage(),
             ),
             theme: theme,

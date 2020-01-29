@@ -29,7 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   meta: ^1.1.6
   equatable: ^0.6.0
 
@@ -483,7 +483,7 @@ class LoginPage extends StatelessWidget {
         title: Text('Login'),
       ),
       body: BlocProvider(
-        builder: (context) {
+        create: (context) {
           return LoginBloc(
             authenticationBloc: BlocProvider.of<AuthenticationBloc>(context),
             userRepository: userRepository,
@@ -635,7 +635,7 @@ void main() {
   final userRepository = UserRepository();
   runApp(
     BlocProvider<AuthenticationBloc>(
-      builder: (context) {
+      create: (context) {
         return AuthenticationBloc(userRepository: userRepository)
           ..add(AppStarted());
       },

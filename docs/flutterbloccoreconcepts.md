@@ -49,11 +49,11 @@ BlocBuilder<BlocA, BlocAState>(
 
 **BlocProvider** is a Flutter widget which provides a bloc to its children via `BlocProvider.of<T>(context)`. It is used as a dependency injection (DI) widget so that a single instance of a bloc can be provided to multiple widgets within a subtree.
 
-In most cases, `BlocProvider` should be used to build new `blocs` which will be made available to the rest of the subtree. In this case, since `BlocProvider` is responsible for creating the bloc, it will automatically handle closing the bloc.
+In most cases, `BlocProvider` should be used to create new `blocs` which will be made available to the rest of the subtree. In this case, since `BlocProvider` is responsible for creating the bloc, it will automatically handle closing the bloc.
 
 ```dart
 BlocProvider(
-  builder: (BuildContext context) => BlocA(),
+  create: (BuildContext context) => BlocA(),
   child: ChildA(),
 );
 ```
@@ -81,11 +81,11 @@ By using `MultiBlocProvider` we can go from:
 
 ```dart
 BlocProvider<BlocA>(
-  builder: (BuildContext context) => BlocA(),
+  create: (BuildContext context) => BlocA(),
   child: BlocProvider<BlocB>(
-    builder: (BuildContext context) => BlocB(),
+    create: (BuildContext context) => BlocB(),
     child: BlocProvider<BlocC>(
-      builder: (BuildContext context) => BlocC(),
+      create: (BuildContext context) => BlocC(),
       child: ChildA(),
     )
   )
@@ -98,13 +98,13 @@ to:
 MultiBlocProvider(
   providers: [
     BlocProvider<BlocA>(
-      builder: (BuildContext context) => BlocA(),
+      create: (BuildContext context) => BlocA(),
     ),
     BlocProvider<BlocB>(
-      builder: (BuildContext context) => BlocB(),
+      create: (BuildContext context) => BlocB(),
     ),
     BlocProvider<BlocC>(
-      builder: (BuildContext context) => BlocC(),
+      create: (BuildContext context) => BlocC(),
     ),
   ],
   child: ChildA(),
@@ -189,6 +189,45 @@ MultiBlocListener(
     ),
   ],
   child: ChildA(),
+)
+```
+
+### BlocConsumer
+
+**BlocConsumer** exposes a `builder` and `listener` in order react to new states. `BlocConsumer` is analogous to a nested `BlocListener` and `BlocBuilder` but reduces the amount of boilerplate needed. `BlocConsumer` should only be used when it is necessary to both rebuild UI and execute other reactions to state changes in the `bloc`. `BlocConsumer` takes a required `BlocWidgetBuilder` and `BlocWidgetListener` and an optional `bloc`, `BlocBuilderCondition`, and `BlocListenerCondition`.
+
+If the `bloc` parameter is omitted, `BlocConsumer` will automatically perform a lookup using
+`BlocProvider` and the current `BuildContext`.
+
+```dart
+BlocConsumer<BlocA, BlocAState>(
+  listener: (context, state) {
+    // do stuff here based on BlocA's state
+  },
+  builder: (context, state) {
+    // return widget here based on BlocA's state
+  }
+)
+```
+
+An optional `listenWhen` and `buildWhen` can be implemented for more granular control over when `listener` and `builder` are called. The `listenWhen` and `buildWhen` will be invoked on each `bloc` `state` change. They each take the previous `state` and current `state` and must return a `bool` which determines whether or not the `builder` and/or `listener` function will be invoked. The previous `state` will be initialized to the `state` of the `bloc` when the `BlocConsumer` is initialized. `listenWhen` and `buildWhen` are optional and if they aren't implemented, they will default to `true`.
+
+```dart
+BlocConsumer<BlocA, BlocAState>(
+  listenWhen: (previous, current) {
+    // return true/false to determine whether or not
+    // to invoke listener with state
+  },
+  listener: (context, state) {
+    // do stuff here based on BlocA's state
+  },
+  buildWhen: (previous, current) {
+    // return true/false to determine whether or not
+    // to rebuild the widget with state
+  },
+  builder: (context, state) {
+    // return widget here based on BlocA's state
+  }
 )
 ```
 

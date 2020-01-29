@@ -23,18 +23,19 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.0.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   http: ^0.12.0
-  equatable: ^0.6.0
+  equatable: ^1.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^4.0.0
 
 flutter:
   uses-material-design: true
@@ -461,7 +462,7 @@ Future<int> getLocationId(String city) async {
 }
 ```
 
-Here we are just making a simple HTTP request and then decoding the response as a list. Speaking of decoding, you'll see `jsonDecode` is a function from a dependency we need to import. So let's go ahead nad do that now. At the top of the file by the other imports go ahead and add:
+Here we are just making a simple HTTP request and then decoding the response as a list. Speaking of decoding, you'll see `jsonDecode` is a function from a dependency we need to import. So let's go ahead and do that now. At the top of the file by the other imports go ahead and add:
 
 ```dart
 import 'dart:convert';
@@ -529,7 +530,7 @@ class WeatherRepository {
 
   Future<Weather> getWeather(String city) async {
     final int locationId = await weatherApiClient.getLocationId(city);
-    return await weatherApiClient.fetchWeather(locationId);
+    return weatherApiClient.fetchWeather(locationId);
   }
 }
 ```
@@ -686,23 +687,37 @@ That's all there is to it! Now we're ready to move on to the final layer: the pr
 
 ### Setup
 
-As you've probably already seen in other tutorials, we're going to create a `SimpleBlocDelegate` so that we can see all state transitions in our application. Let's go ahead and add this to our `main.dart` file above the `main()` function. Then go ahead and delete all the code below `main`
+As you've probably already seen in other tutorials, we're going to create a `SimpleBlocDelegate` so that we can see all state transitions in our application. Let's go ahead and create `simple_bloc_delegate.dart` and create our own custom delegate.
 
 ```dart
 import 'package:bloc/bloc.dart';
 
 class SimpleBlocDelegate extends BlocDelegate {
   @override
+  void onEvent(Bloc bloc, Object event) {
+    super.onEvent(bloc, event);
+    print('onEvent $event');
+  }
+
+  @override
   onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    print(transition);
+    print('onTransition $transition');
+  }
+
+  @override
+  void onError(Bloc bloc, Object error, StackTrace stacktrace) {
+    super.onError(bloc, error, stacktrace);
+    print('onError $error');
   }
 }
 ```
 
-Next, we're going to set our delegate in our `main` function like so:
+We can then import it into `main.dart` file and set our delegate like so:
 
 ```dart
+import 'package:flutter_weather/simple_bloc_delegate.dart';
+
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(App());
@@ -745,7 +760,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Weather',
       home: BlocProvider(
-        builder: (context) =>
+        create: (context) =>
             WeatherBloc(weatherRepository: weatherRepository),
         child: Weather(),
       ),
@@ -1204,6 +1219,38 @@ if (event is RefreshWeather) {
 
 Here we are just creating a new event that will ask our weatherRepository to make an API call to get the weather for the city.
 
+We can refactor `mapEventToState` to use some private helper functions in order to keep the code organized and easy to follow:
+
+```dart
+@override
+Stream<WeatherState> mapEventToState(WeatherEvent event) async* {
+  if (event is FetchWeather) {
+    yield* _mapFetchWeatherToState(event);
+  } else if (event is RefreshWeather) {
+    yield* _mapRefreshWeatherToState(event);
+  }
+}
+
+Stream<WeatherState> _mapFetchWeatherToState(FetchWeather event) async* {
+  yield WeatherLoading();
+  try {
+    final Weather weather = await weatherRepository.getWeather(event.city);
+    yield WeatherLoaded(weather: weather);
+  } catch (_) {
+    yield WeatherError();
+  }
+}
+
+Stream<WeatherState> _mapRefreshWeatherToState(RefreshWeather event) async* {
+  try {
+    final Weather weather = await weatherRepository.getWeather(event.city);
+    yield WeatherLoaded(weather: weather);
+  } catch (_) {
+    yield state;
+  }
+}
+```
+
 Lastly, we need to update our presentation layer to use a `RefreshIndicator` widget. Let's go ahead and modify our `Weather` widget in `widgets/weather.dart`. There are a few things we need to do.
 
 - Import `async` to the `weather.dart` file to handle `Future`
@@ -1402,7 +1449,7 @@ void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(
     BlocProvider<ThemeBloc>(
-      builder: (context) => ThemeBloc(),
+      create: (context) => ThemeBloc(),
       child: App(weatherRepository: weatherRepository),
     ),
   );
@@ -1427,7 +1474,7 @@ class App extends StatelessWidget {
           title: 'Flutter Weather',
           theme: themeState.theme,
           home: BlocProvider(
-            builder: (context) =>
+            create: (context) =>
                 WeatherBloc(weatherRepository: weatherRepository),
             child: Weather(),
           ),
@@ -1684,10 +1731,10 @@ void main() {
     MultiBlocProvider(
       providers: [
         BlocProvider<ThemeBloc>(
-          builder: (context) => ThemeBloc(),
+          create: (context) => ThemeBloc(),
         ),
         BlocProvider<SettingsBloc>(
-          builder: (context) => SettingsBloc(),
+          create: (context) => SettingsBloc(),
         ),
       ],
       child: App(weatherRepository: weatherRepository),

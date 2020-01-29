@@ -1,14 +1,14 @@
 <img src="https://raw.githubusercontent.com/felangel/bloc/master/docs/assets/flutter_bloc_logo_full.png" height="60" alt="Flutter Bloc Package" />
 
 [![Pub](https://img.shields.io/pub/v/flutter_bloc.svg)](https://pub.dev/packages/flutter_bloc)
-[![Build Status](https://travis-ci.com/felangel/bloc.svg?branch=master)](https://travis-ci.com/felangel/bloc)
+[![build](https://github.com/felangel/bloc/workflows/build/badge.svg)](https://github.com/felangel/bloc/actions)
 [![codecov](https://codecov.io/gh/felangel/Bloc/branch/master/graph/badge.svg)](https://codecov.io/gh/felangel/bloc)
 [![style: effective dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
 [![Flutter.io](https://img.shields.io/badge/flutter-website-deepskyblue.svg)](https://flutter.io/docs/development/data-and-backend/state-mgmt/options#bloc--rx)
 [![Awesome Flutter](https://img.shields.io/badge/awesome-flutter-blue.svg?longCache=true)](https://github.com/Solido/awesome-flutter#standard)
 [![Flutter Samples](https://img.shields.io/badge/flutter-samples-teal.svg?longCache=true)](http://fluttersamples.com)
 [![Star on GitHub](https://img.shields.io/github/stars/felangel/bloc.svg?style=flat&logo=github&colorB=deeppink&label=stars)](https://github.com/felangel/bloc)
-[![Gitter](https://img.shields.io/badge/gitter-chat-hotpink.svg)](https://gitter.im/bloc_package/Lobby)
+[![Discord](https://img.shields.io/discord/649708778631200778.svg?logo=discord&color=blue)](https://discord.gg/Hc5KD3g)
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -60,11 +60,11 @@ BlocBuilder<BlocA, BlocAState>(
 
 **BlocProvider** is a Flutter widget which provides a bloc to its children via `BlocProvider.of<T>(context)`. It is used as a dependency injection (DI) widget so that a single instance of a bloc can be provided to multiple widgets within a subtree.
 
-In most cases, `BlocProvider` should be used to build new `blocs` which will be made available to the rest of the subtree. In this case, since `BlocProvider` is responsible for creating the bloc, it will automatically handle closing the bloc.
+In most cases, `BlocProvider` should be used to create new `blocs` which will be made available to the rest of the subtree. In this case, since `BlocProvider` is responsible for creating the bloc, it will automatically handle closing the bloc.
 
 ```dart
 BlocProvider(
-  builder: (BuildContext context) => BlocA(),
+  create: (BuildContext context) => BlocA(),
   child: ChildA(),
 );
 ```
@@ -90,11 +90,11 @@ By using `MultiBlocProvider` we can go from:
 
 ```dart
 BlocProvider<BlocA>(
-  builder: (BuildContext context) => BlocA(),
+  create: (BuildContext context) => BlocA(),
   child: BlocProvider<BlocB>(
-    builder: (BuildContext context) => BlocB(),
+    create: (BuildContext context) => BlocB(),
     child: BlocProvider<BlocC>(
-      builder: (BuildContext context) => BlocC(),
+      create: (BuildContext context) => BlocC(),
       child: ChildA(),
     )
   )
@@ -107,13 +107,13 @@ to:
 MultiBlocProvider(
   providers: [
     BlocProvider<BlocA>(
-      builder: (BuildContext context) => BlocA(),
+      create: (BuildContext context) => BlocA(),
     ),
     BlocProvider<BlocB>(
-      builder: (BuildContext context) => BlocB(),
+      create: (BuildContext context) => BlocB(),
     ),
     BlocProvider<BlocC>(
-      builder: (BuildContext context) => BlocC(),
+      create: (BuildContext context) => BlocC(),
     ),
   ],
   child: ChildA(),
@@ -197,11 +197,48 @@ MultiBlocListener(
 )
 ```
 
+**BlocConsumer** exposes a `builder` and `listener` in order react to new states. `BlocConsumer` is analogous to a nested `BlocListener` and `BlocBuilder` but reduces the amount of boilerplate needed. `BlocConsumer` should only be used when it is necessary to both rebuild UI and execute other reactions to state changes in the `bloc`. `BlocConsumer` takes a required `BlocWidgetBuilder` and `BlocWidgetListener` and an optional `bloc`, `BlocBuilderCondition`, and `BlocListenerCondition`.
+
+If the `bloc` parameter is omitted, `BlocConsumer` will automatically perform a lookup using
+`BlocProvider` and the current `BuildContext`.
+
+```dart
+BlocConsumer<BlocA, BlocAState>(
+  listener: (context, state) {
+    // do stuff here based on BlocA's state
+  },
+  builder: (context, state) {
+    // return widget here based on BlocA's state
+  }
+)
+```
+
+An optional `listenWhen` and `buildWhen` can be implemented for more granular control over when `listener` and `builder` are called. The `listenWhen` and `buildWhen` will be invoked on each `bloc` `state` change. They each take the previous `state` and current `state` and must return a `bool` which determines whether or not the `builder` and/or `listener` function will be invoked. The previous `state` will be initialized to the `state` of the `bloc` when the `BlocConsumer` is initialized. `listenWhen` and `buildWhen` are optional and if they aren't implemented, they will default to `true`.
+
+```dart
+BlocConsumer<BlocA, BlocAState>(
+  listenWhen: (previous, current) {
+    // return true/false to determine whether or not
+    // to invoke listener with state
+  },
+  listener: (context, state) {
+    // do stuff here based on BlocA's state
+  },
+  buildWhen: (previous, current) {
+    // return true/false to determine whether or not
+    // to rebuild the widget with state
+  },
+  builder: (context, state) {
+    // return widget here based on BlocA's state
+  }
+)
+```
+
 **RepositoryProvider** is a Flutter widget which provides a repository to its children via `RepositoryProvider.of<T>(context)`. It is used as a dependency injection (DI) widget so that a single instance of a repository can be provided to multiple widgets within a subtree. `BlocProvider` should be used to provide blocs whereas `RepositoryProvider` should only be used for repositories.
 
 ```dart
 RepositoryProvider(
-  builder: (context) => RepositoryA(),
+  create: (context) => RepositoryA(),
   child: ChildA(),
 );
 ```
@@ -218,11 +255,11 @@ By using `MultiRepositoryProvider` we can go from:
 
 ```dart
 RepositoryProvider<RepositoryA>(
-  builder: (context) => RepositoryA(),
+  create: (context) => RepositoryA(),
   child: RepositoryProvider<RepositoryB>(
-    builder: (context) => RepositoryB(),
+    create: (context) => RepositoryB(),
     child: RepositoryProvider<RepositoryC>(
-      builder: (context) => RepositoryC(),
+      create: (context) => RepositoryC(),
       child: ChildA(),
     )
   )
@@ -235,13 +272,13 @@ to:
 MultiRepositoryProvider(
   providers: [
     RepositoryProvider<RepositoryA>(
-      builder: (context) => RepositoryA(),
+      create: (context) => RepositoryA(),
     ),
     RepositoryProvider<RepositoryB>(
-      builder: (context) => RepositoryB(),
+      create: (context) => RepositoryB(),
     ),
     RepositoryProvider<RepositoryC>(
-      builder: (context) => RepositoryC(),
+      create: (context) => RepositoryC(),
     ),
   ],
   child: ChildA(),
@@ -385,7 +422,7 @@ At this point we have successfully separated our presentational layer from our b
 
 ## Dart Versions
 
-- Dart 2: >= 2.0.0
+- Dart 2: >= 2.6.0
 
 ### Maintainers
 

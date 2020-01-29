@@ -1,3 +1,31 @@
+# 3.1.0
+
+- Expose lazy parameter on `RepositoryProvider` and `BlocProvider` ([#749](https://github.com/felangel/bloc/pull/749))
+- Updated to `provider: ^4.0.1` ([#748](https://github.com/felangel/bloc/issues/748))
+- Add `BlocConsumer` ([#545](https://github.com/felangel/bloc/issues/545))
+- Export `bloc` as part of `flutter_bloc`
+
+# 3.0.0
+
+- Updated to `bloc: ^3.0.0` ([#700](https://github.com/felangel/bloc/pull/700))
+- Updated to `flutter >=1.12.1` ([#700](https://github.com/felangel/bloc/pull/700))
+- Updated to `provider: ^4.0.0` ([#700](https://github.com/felangel/bloc/pull/700), [#734](https://github.com/felangel/bloc/pull/734))
+- Revert `BlocBuilder` and `BlocListener` condition behavior to set `previousState` to the previous bloc state ([#709](https://github.com/felangel/bloc/issues/709))
+
+# 3.0.0-dev.1
+
+- Updated to `bloc: ^3.0.0-dev.1`
+
+# 2.1.1
+
+- Fix internal analysis warnings
+- Enforce provider `^3.2.0`
+
+# 2.1.0
+
+- Deprecate `builder` in `BlocProvider` in favor of `create` to align with `provider`.
+- Deprecate `builder` in `RepositoryProvider` in favor of `create` to align with `provider`.
+
 # 2.0.1
 
 - Fix `BlocBuilder` and `BlocListener` condition behavior to set `previousState` to the previous state used by `BlocBuilder`/`BlocListener` instead of the previous state of the `bloc`.

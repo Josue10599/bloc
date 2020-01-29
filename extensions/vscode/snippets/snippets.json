@@ -62,12 +62,26 @@
       ")"
     ]
   },
+  "blocconsumer": {
+    "scope": "dart",
+    "prefix": "blocconsumer",
+    "body": [
+      "BlocConsumer<${1:MyBloc}, ${2:MyState}>(",
+      "\tlistener: (context, state) {",
+      "\t\t${3:// TODO: implement listener}",
+      "\t},",
+      "\tbuilder: (context, state) {",
+      "\t\treturn ${4:Container();}",
+      "\t},",
+      ")"
+    ]
+  },
   "blocprovider": {
     "scope": "dart",
     "prefix": "blocprovider",
     "body": [
       "BlocProvider(",
-      "\tbuilder: (context) => ${1:MyBloc}(),",
+      "\tcreate: (context) => ${1:MyBloc}(),",
       "\tchild: ${2:Container()},",
       ")"
     ]
@@ -79,10 +93,10 @@
       "MultiBlocProvider(",
       "\tproviders: [",
       "\t\tBlocProvider<${1:MyBloc}>(",
-      "\t\t\tbuilder: (context) => ${1:MyBloc}(),",
+      "\t\t\tcreate: (context) => ${1:MyBloc}(),",
       "\t\t),",
       "\t\tBlocProvider<${2:MyOtherBloc}>(",
-      "\t\t\tbuilder: (context) => ${2:MyOtherBloc}(),",
+      "\t\t\tcreate: (context) => ${2:MyOtherBloc}(),",
       "\t\t),",
       "\t],",
       "\tchild: ${3:Container()},",
@@ -94,7 +108,7 @@
     "prefix": "repositoryprovider",
     "body": [
       "RepositoryProvider(",
-      "\tbuilder: (context) => ${1:myValue},",
+      "\tcreate: (context) => ${1:MyRepository}(),",
       "\tchild: ${2:Container()},",
       ")"
     ]
@@ -105,11 +119,11 @@
     "body": [
       "MultiRepositoryProvider(",
       "\tproviders: [",
-      "\t\tRepositoryProvider<${1:MyValue}>(",
-      "\t\t\tbuilder: (context) => ${2:myValue},",
+      "\t\tRepositoryProvider<${1:MyRepository}>(",
+      "\t\t\tcreate: (context) => ${1:MyRepository}(),",
       "\t\t),",
-      "\t\tRepositoryProvider<${3:MyOtherValue}>(",
-      "\t\t\tbuilder: (context) => ${4:myOtherValue},",
+      "\t\tRepositoryProvider<${3:MyOtherRepository}>(",
+      "\t\t\tcreate: (context) => ${4:MyOtherRepository}(),",
       "\t\t),",
       "\t],",
       "\tchild: ${5:Container()},",
@@ -141,6 +155,20 @@
       "\t\t${4:// TODO: implement onTransition}",
       "\t}",
       "}"
+    ]
+  },
+  "blocof": {
+    "scope": "dart",
+    "prefix": "blocof",
+    "body": [      
+      "BlocProvider.of<$1>(context)"
+    ]
+  },
+  "repositoryof": {
+    "scope": "dart",
+    "prefix": "repositoryof",
+    "body": [      
+      "RepositoryProvider.of<$1>(context)"
     ]
   },
   "blocstate": {

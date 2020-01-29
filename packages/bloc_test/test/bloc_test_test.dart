@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'helpers/helpers.dart';
+
+class MockRepository extends Mock implements Repository {}
 
 void main() {
   group('blocTest', () {
@@ -30,6 +33,18 @@ void main() {
         },
         expect: [0, 1],
       );
+
+      blocTest(
+        'emits [0, 1, 2] when CounterEvent.increment is called multiple times'
+        'with async act',
+        build: () => CounterBloc(),
+        act: (bloc) async {
+          bloc.add(CounterEvent.increment);
+          await Future.delayed(Duration(milliseconds: 10));
+          bloc.add(CounterEvent.increment);
+        },
+        expect: [0, 1, 2],
+      );
     });
 
     group('AsyncCounterBloc', () {
@@ -43,6 +58,34 @@ void main() {
         'emits [0, 1] when AsyncCounterEvent.increment is added',
         build: () => AsyncCounterBloc(),
         act: (bloc) => bloc.add(AsyncCounterEvent.increment),
+        expect: [0, 1],
+      );
+
+      blocTest(
+        'emits [0, 1, 2] when AsyncCounterEvent.increment is called multiple'
+        'times with async act',
+        build: () => AsyncCounterBloc(),
+        act: (bloc) async {
+          bloc.add(AsyncCounterEvent.increment);
+          await Future.delayed(Duration(milliseconds: 10));
+          bloc.add(AsyncCounterEvent.increment);
+        },
+        expect: [0, 1, 2],
+      );
+    });
+
+    group('DebounceCounterBloc', () {
+      blocTest(
+        'emits [0] when nothing is added',
+        build: () => DebounceCounterBloc(),
+        expect: [0],
+      );
+
+      blocTest(
+        'emits [0, 1] when DebounceCounterEvent.increment is added',
+        build: () => DebounceCounterBloc(),
+        act: (bloc) => bloc.add(DebounceCounterEvent.increment),
+        wait: const Duration(milliseconds: 300),
         expect: [0, 1],
       );
     });
@@ -59,6 +102,57 @@ void main() {
         build: () => MultiCounterBloc(),
         act: (bloc) => bloc.add(MultiCounterEvent.increment),
         expect: [0, 1, 2],
+      );
+
+      blocTest(
+        'emits [0, 1, 2, 3, 4] when MultiCounterEvent.increment is called'
+        'multiple times with async act',
+        build: () => MultiCounterBloc(),
+        act: (bloc) async {
+          bloc.add(MultiCounterEvent.increment);
+          await Future.delayed(Duration(milliseconds: 10));
+          bloc.add(MultiCounterEvent.increment);
+        },
+        expect: [0, 1, 2, 3, 4],
+      );
+    });
+
+    group('ComplexBloc', () {
+      blocTest(
+        'emits [ComplexStateA] when nothing is added',
+        build: () => ComplexBloc(),
+        expect: [isA<ComplexStateA>()],
+      );
+
+      blocTest(
+        'emits [ComplexStateA, ComplexStateB] when ComplexEventB is added',
+        build: () => ComplexBloc(),
+        act: (bloc) => bloc.add(ComplexEventB()),
+        expect: [isA<ComplexStateA>(), isA<ComplexStateB>()],
+      );
+    });
+
+    group('SideEffectCounterBloc', () {
+      Repository repository;
+
+      setUp(() {
+        repository = MockRepository();
+      });
+
+      blocTest(
+        'emits [0] when nothing is added',
+        build: () => SideEffectCounterBloc(repository),
+        expect: [0],
+      );
+
+      blocTest(
+        'emits [0, 1] when SideEffectCounterEvent.increment is added',
+        build: () => SideEffectCounterBloc(repository),
+        act: (bloc) => bloc.add(SideEffectCounterEvent.increment),
+        expect: [0, 1],
+        verify: () async {
+          verify(repository.sideEffect()).called(1);
+        },
       );
     });
   });

@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^2.0.0
+  flutter_bloc: ^3.1.0
   equatable: ^0.6.0
   wave: ^0.0.8
 
@@ -619,7 +619,7 @@ class MyApp extends StatelessWidget {
       ),
       title: 'Flutter Timer',
       home: BlocProvider(
-        builder: (context) => TimerBloc(ticker: Ticker()),
+        create: (context) => TimerBloc(ticker: Ticker()),
         child: Timer(),
       ),
     );
@@ -875,7 +875,7 @@ class MyApp extends StatelessWidget {
       ),
       title: 'Flutter Timer',
       home: BlocProvider(
-        builder: (context) => TimerBloc(ticker: Ticker()),
+        create: (context) => TimerBloc(ticker: Ticker()),
         child: Timer(),
       ),
     );
